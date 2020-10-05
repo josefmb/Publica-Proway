@@ -1,13 +1,13 @@
 let dadosTabela = [];
 
-let bodyTabela, inputJogo, inputJogoAlterar, inputPlacar, inputPlacarAlterar,
+let bodydadosTabela, inputJogo, inputJogoAlterar, inputPlacar, inputPlacarAlterar,
   botaoAdd, botaoAlterar, jogoAtual, placarAtual, minimoAtual, maximoAtual = null;
 let quebraMax = 1;
 let quebraMin = 1;
 let quebrouRecordeMin = false;
 
 window.addEventListener('load', () => {
-  bodyTabela = document.getElementById('bodyTabela');
+  bodydadosTabela = document.getElementById('bodydadosTabela');
   inputJogo = document.getElementById('inputJogo');
   inputJogoAlterar = document.getElementById('inputJogoAlterar');
   inputPlacarAlterar = document.getElementById('inputPlacarAlterar');
@@ -48,21 +48,15 @@ window.addEventListener('load', () => {
     QuebraMax: 1
   }];
 
-  let localStorageTabela = JSON.parse(localStorage
-    .getItem('tabela'));
-  tabela = localStorage
-    .getItem('tabela') !== null ? localStorageTabela : [];
-
   renderizar();
 })
 
 
 function renderizar() {
-  tabela = [...dadosTabela];
-  tabela.sort((a, b) => {
+  dadosTabela.sort((a, b) => {
     return parseInt(a.Jogo) - parseInt(b.Jogo);
   });
-  carregarTabela();
+  carregarDadosTabela();
   botaoAdd.addEventListener('click', addDados);
   inputJogo.addEventListener('keyup', (evento) => {
     // A tecla com keyCode 13 é o Enter
@@ -80,16 +74,10 @@ function renderizar() {
   alterarDados();
 };
 
-const atualizarLocalStorage = () => {
-  localStorage.setItem('tabela', JSON.stringify(tabela));
-  console.log(tabela);
-}
+function carregarDadosTabela() {
+  let dadosTabelaHTML = '<tr>';
 
-
-function carregarTabela() {
-  let tabelaHTML = '<tr>';
-
-  tabela.forEach(linha => {
+  dadosTabela.forEach(linha => {
     const { Jogo, Placar, Mínimo, Máximo, QuebraMin, QuebraMax } = linha;
 
     const linhaHTML = `
@@ -104,44 +92,44 @@ function carregarTabela() {
     <button type="button" class="btn btn-danger">Excluir</button>
     </td>
     `;
-    tabelaHTML += linhaHTML;
-    tabelaHTML += '</tr>';
+    dadosTabelaHTML += linhaHTML;
+    dadosTabelaHTML += '</tr>';
   });
 
-  bodyTabela.innerHTML = tabelaHTML;
+  bodyTabela.innerHTML = dadosTabelaHTML;
 };
 
 function addDados() {
   jogoAtual = inputJogo.value;
   placarAtual = inputPlacar.value;
-  let indice = tabela.length - 1;
+  let indice = dadosTabela.length - 1;
 
   if (jogoAtual.trim() === '' || placarAtual.trim() === '') {
     return alert('Você precisa preencher todos os campos');
   };
 
-  for (let i = 0; i < tabela.length; i++) {
-    if (tabela[i].Jogo == jogoAtual) {
+  for (let i = 0; i < dadosTabela.length; i++) {
+    if (dadosTabela[i].Jogo == jogoAtual) {
       inputJogo.style.border = '1px solid red';
       return alert('Esse jogo já existe, não é possível criar novamente');
     }
   }
 
-  if (placarAtual < tabela[indice].Mínimo) {
+  if (placarAtual < dadosTabela[indice].Mínimo) {
     quebraMin++;
-    maximoAtual = tabela[indice].Máximo;
+    maximoAtual = dadosTabela[indice].Máximo;
     minimoAtual = placarAtual;
   }
 
-  else if (placarAtual > tabela[indice].Máximo) {
+  else if (placarAtual > dadosTabela[indice].Máximo) {
     quebraMax++;
-    minimoAtual = tabela[indice].Mínimo
+    minimoAtual = dadosTabela[indice].Mínimo
     maximoAtual = placarAtual;
   }
 
   else {
-    minimoAtual = tabela[indice].Mínimo;
-    maximoAtual = tabela[indice].Máximo;
+    minimoAtual = dadosTabela[indice].Mínimo;
+    maximoAtual = dadosTabela[indice].Máximo;
   }
 
   minimoAtual = parseInt(minimoAtual);
@@ -156,12 +144,10 @@ function addDados() {
     QuebraMax: quebraMax
   };
 
-  console.log(linhaNova);
 
-  tabela = [...tabela, linhaNova];
-  carregarTabela();
-  // renderizar();
-  atualizarLocalStorage();
+  dadosTabela = [...dadosTabela, linhaNova];
+  carregarDadosTabela();
+  renderizar();
   inputJogo.value = '';
   inputPlacar.value = '';
 };
@@ -171,29 +157,10 @@ function excluirDados() {
 
   for (let i = 0; i < listaBotoes.length; i++) {
     let botaoAtual = listaBotoes[i];
-    console.log(botaoAtual)
-    let entrou = false;
     botaoAtual.addEventListener('click', () => {
-      console.log(botaoAtual);
       if (window.confirm('Você tem certeza que deseja excluir o Jogo?')) {
         botaoAtual.parentElement.parentElement.remove();
-        /*for (let j = 0; j < tabela.length; j++) {
-          entrou = true
-          console.log(tabela[i].Mínimo);
-          console.log(typeof (tabela[j].Mínimo));
-          if (tabela[i].Mínimo < tabela[j].Mínimo) {
-            console.log('oi')
-            minimoAtual = tabela[j].Mínimo;
-            if (entrou) {
-              quebraMin = tabela[j].Mínimo;
-              entrou = false;
-            };
-          };
-        };*/
-
-        tabela.splice(i, 1);
-        localStorage.removeItem('tabela', JSON.stringify(tabela[i]));
-        atualizarLocalStorage();
+        dadosTabela.splice(i, 1);
       }
     })
   }
@@ -207,62 +174,51 @@ function alterarDados() {
     let botaoAtual = listaBotoes[i];
 
     botaoAtual.addEventListener('click', () => {
-      console.log(listaBotoes);
-      listaBotoes = [];
-      console.log(listaBotoes);
-      console.log("entrou aqui");
-
       botaoAlterar.addEventListener('click', () => {
         let jogoAtualAlterar = inputJogoAlterar.value;
         let placarAtualAlterar = inputPlacarAlterar.value;
-        let indice = tabela.length - 1;
-
-        console.log(botaoAtual)
-
-        console.log(jogoAtualAlterar + '' + placarAtualAlterar);
+        let indice = dadosTabela.length - 1;
 
         if (jogoAtualAlterar.trim() === '' || placarAtualAlterar.trim() === '') {
           return alert('Você precisa preencher todos os campos');
         };
 
-        for (let j = 0; j < tabela.length; j++) {
-          if (tabela[j].Jogo == jogoAtualAlterar) {
+        for (let j = 0; j < dadosTabela.length; j++) {
+          if (dadosTabela[j].Jogo == jogoAtualAlterar) {
             inputJogoAlterar.style.border = '1px solid red';
             return alert('Esse jogo já existe, não é possível criar novamente');
           }
         }
 
-        if (placarAtualAlterar < tabela[indice].Mínimo) {
+        if (placarAtualAlterar < dadosTabela[indice].Mínimo) {
           quebraMin++;
-          maximoAtual = tabela[indice].Máximo;
+          maximoAtual = dadosTabela[indice].Máximo;
           minimoAtual = placarAtualAlterar;
         }
 
-        else if (placarAtualAlterar > tabela[indice].Máximo) {
+        else if (placarAtualAlterar > dadosTabela[indice].Máximo) {
           quebraMax++;
-          minimoAtual = tabela[indice].Mínimo
+          minimoAtual = dadosTabela[indice].Mínimo
           maximoAtual = placarAtualAlterar;
         }
 
         else {
-          minimoAtual = tabela[indice].Mínimo;
-          maximoAtual = tabela[indice].Máximo;
+          minimoAtual = dadosTabela[indice].Mínimo;
+          maximoAtual = dadosTabela[indice].Máximo;
         }
 
         minimoAtual = parseInt(minimoAtual);
         maximoAtual = parseInt(maximoAtual);
 
 
-        tabela[i].Jogo = inputJogoAlterar.value;
-        tabela[i].Placar = inputPlacarAlterar.value;
-        tabela[i].Mínimo = minimoAtual;
-        tabela[i].Máximo = maximoAtual;
-        tabela[i].QuebraMax = quebraMax;
-        tabela[i].QuebraMin = quebraMin;
+        dadosTabela[i].Jogo = inputJogoAlterar.value;
+        dadosTabela[i].Placar = inputPlacarAlterar.value;
+        dadosTabela[i].Mínimo = minimoAtual;
+        dadosTabela[i].Máximo = maximoAtual;
+        dadosTabela[i].QuebraMax = quebraMax;
+        dadosTabela[i].QuebraMin = quebraMin;
 
-        localStorage.setItem('tabela', JSON.stringify(localStorage[i]));
-        atualizarLocalStorage();
-        carregarTabela();
+        carregarDadosTabela();
         inputJogoAlterar.value = '';
         inputPlacarAlterar.value = '';
         return
