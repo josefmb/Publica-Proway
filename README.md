@@ -1,6 +1,10 @@
 # Publica-Proway
 
-Olá, bem vindo ao meu repositório, a seguir estarão as instruções para a execução do projeto.
+Olá, bem vindo ao meu repositório.
+
+Gostaria de informar primeiramente que, a questão prática em si foi resolvida na linguagem Python, encontrando-se a resolução na pasta Projeto Python. A pasta Vanilla JS é apenas um adicional da realização da questão em Javascripr puro, não persistindo dados em um Banco.
+
+A seguir estarão as instruções para a execução do projeto principal.
 
 Instruções: 
 
